@@ -4,6 +4,7 @@ import { Topbar } from "@/components/layout/topbar";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { QuickAddTransaction } from "@/components/forms/quick-add";
 import { NotificationEngine } from "@/components/notifications/notification-engine";
+import { PageTransition } from "@/components/layout/page-transition";
 
 export default function AppLayout({
   children,
@@ -16,7 +17,9 @@ export default function AppLayout({
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar />
-          <main className="flex-1 px-4 py-5 lg:px-6 lg:py-6">{children}</main>
+          <main className="flex-1 px-4 py-5 lg:px-6 lg:py-6">
+            <PageTransition>{children}</PageTransition>
+          </main>
         </div>
         <CommandPalette />
         <QuickAddTransaction />

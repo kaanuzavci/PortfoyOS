@@ -4,47 +4,35 @@ Son güncelleme: 2026-06-14
 
 ## Tamamlanan
 
-### ✅ Faz 0 — İskelet & repo
-- Next.js 16 + TS + Tailwind v4 + shadcn/ui kuruldu.
-- Rafine koyu zinc teması + finans semantik renkleri (gain/loss/warn/info), tabular-nums.
-- Providers: next-themes (dark-first) + TanStack Query + Auth + Tooltip + Sonner.
-- Firebase config (env varsa başlatır, yoksa **yerel demo modu**).
-- Auth: Firebase veya yerel demo; AuthGuard ile rota koruması; bölünmüş login ekranı.
-- Layout: sidebar (gruplu nav), topbar (başlık, ⌘K, bildirim, tema, kullanıcı), ⌘K komut paleti.
-
-### ✅ Faz 2 — Hesaplama motoru (testli)
-- `lib/calc/`: position, xirr, timeseries, real-return, benchmark, streak, tax, portfolio.
-- **40 Vitest testi geçti.** (`npm test`)
-
-### ✅ Faz 1 (temel) — Veri katmanı
-- Zustand store (localStorage persist) — tüm koleksiyonlar + CRUD aksiyonları.
-- Demo seed üreteci (6 varlık, işlemler, 120 günlük fiyat serisi, makro, IPO, hedef).
-
-### ✅ Faz 3 — Dashboard
-- 4 KPI kartı (count-up + sparkline): Toplam Değer, Toplam K/Z, Reel Getiri, XIRR.
-- Portföy değer grafiği (Recharts, dönem toggle G/H/A/Y/Tüm + maliyet çizgisi).
-- Dağılım donut (tür bazında), en çok kazandıran/kaybettiren (% / ₺ toggle).
-- Aktif seriler şeridi, benchmark kıyas kartı.
-- Boş durum + "Demo verisi yükle".
-- Diğer rotalar: notifications, settings (yedek/geri-yükle/sıfırla), ipo, goals çalışır;
-  transactions/analytics/admin placeholder.
-
-## Sıradaki (devam buradan)
-
-### ⏭️ Faz 1 (UI) — İşlemler & varlık CRUD
-- `/transactions`: filtreli/sıralanabilir tablo, hızlı ekleme modalı (⌘K'den de), CSV.
-- `/admin`: varlık CRUD, hızlı işlem, manuel fiyat güncelleme, makro veri girişi.
-- Varlık detay: fiyat grafiği + avg cost çizgisi, işlem tablosu, journal.
-
-### ⏭️ Faz 4 — Seri + bildirim motoru
-- Seri/eşik/hedef değerlendirme → alert üretimi; toast + bildirim merkezi; ayarlar.
-
-### ⏭️ Faz 5 — Admin panel (tam)
-### ⏭️ Faz 6 — Analizler, IPO eylem, journal, vergi
-### ⏭️ Faz 7 — Fiyat otomasyonu (Cloud Functions)
-### ⏭️ Faz 8 — Cila (PWA, push, ince ayar)
-### ⏭️ Faz 9 — Bitiş: deploy + main'e merge + v1.0.0
+- ✅ **Faz 0 — İskelet & repo:** Next.js 16 + TS + Tailwind v4 + shadcn/ui; koyu zinc
+  teması; providers (next-themes/Query/Auth/Sonner); Firebase config (yoksa yerel
+  demo modu); AuthGuard + login; sidebar/topbar/⌘K komut paleti.
+- ✅ **Faz 2 — Hesaplama motoru:** lib/calc (pozisyon, K/Z, XIRR, dönemsel & reel
+  getiri, benchmark, seri, vergi). **45 Vitest testi.**
+- ✅ **Faz 1 — Veri & CRUD:** Zustand store (localStorage); işlem ekle/düzenle/sil
+  modalı; işlemler tablosu (filtre/sıralama/CSV); varlık formu; demo seed.
+- ✅ **Faz 3 — Dashboard:** 4 KPI (count-up + sparkline), değer grafiği (dönem
+  toggle + maliyet), donut, en çok kazandıran/kaybettiren, seri şeridi, benchmark.
+- ✅ **Faz 5 — Admin panel:** Varlıklar (CRUD + arşiv), Fiyatlar (manuel), Makro,
+  Halka Arz, Hedefler sekmeleri; JSON yedek/geri-yükle/sıfırla (Ayarlar).
+- ✅ **Faz 4 — Bildirim motoru:** saf değerlendirme (seri/hedef/stop/günlük/reel/
+  kilometre taşı/IPO) + dedupe'lu emisyon + seri kırılması + toast + kural ayarları.
+- ✅ **Faz 6 — Analizler & ekstra:** günlük getiri ısı haritası, nominal vs reel,
+  varlık katkı analizi, benchmark; IPO "Katıldım" eylemi; hedef XIRR projeksiyonu;
+  varlık detay (fiyat grafiği + ort. maliyet + işlem tablosu); karar notu (journal).
+- ✅ **Faz 8 (kısmi) — Cila:** Framer Motion sayfa geçişleri + KPI/login girişleri;
+  count-up; PWA manifest + ikon; ⌘K + "n" kısayolu.
 
 ## Durum
-- `npm run build` ✅ · `npm test` ✅ (40) · `npm run typecheck` ✅
-- Git: local `develop` branch'inde. **Remote'a push edilmedi** (kullanıcı onayı bekleniyor).
+- `npm run build` ✅ · `npm test` ✅ (45) · `npm run typecheck` ✅
+- Git: `main` (scaffold) + `develop` (tüm iş) GitHub'a push edildi.
+
+## Sıradaki (opsiyonel / Firebase gerektirir)
+- ⏭️ **Faz 7 — Fiyat otomasyonu:** Cloud Functions cron + PriceProvider adapter'ları
+  (TEFAS/BIST/altın/döviz/TÜFE). Manuel girişe düşebilen tasarım.
+- ⏭️ **Firebase senkron:** store ↔ Firestore, App Check, FCM web push (Faz 8 kalanı).
+- ⏭️ **Faz 9 — Bitiş:** Vercel + Firebase deploy; `develop` → `main` merge + `v1.0.0`.
+
+> Not: Uygulama şu an **yerel demo modunda** tam çalışır. Firebase web config'i
+> `.env.local`'a eklenince gerçek auth + (senkron katmanı yazıldığında) bulut depolama
+> devreye girer. Gizli anahtarlar asla repoya girmez.
