@@ -21,6 +21,7 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { useAuth } from "@/lib/auth/auth-context";
 import { allNavItems } from "@/lib/nav";
 import { useCommandPalette } from "@/components/layout/command-palette";
+import { useQuickAdd } from "@/components/forms/quick-add";
 
 function usePageTitle() {
   const pathname = usePathname();
@@ -35,6 +36,7 @@ export function Topbar() {
   const title = usePageTitle();
   const { user, signOut } = useAuth();
   const openPalette = useCommandPalette((s) => s.open);
+  const openQuickAdd = useQuickAdd((s) => s.open);
 
   const initials =
     user?.displayName?.slice(0, 2).toUpperCase() ??
@@ -75,10 +77,12 @@ export function Topbar() {
           </kbd>
         </button>
 
-        <Button asChild size="sm" className="hidden gap-1.5 sm:flex">
-          <Link href="/transactions?new=1">
-            <Plus className="size-4" /> İşlem
-          </Link>
+        <Button
+          size="sm"
+          className="hidden gap-1.5 sm:flex"
+          onClick={openQuickAdd}
+        >
+          <Plus className="size-4" /> İşlem
         </Button>
 
         <NotificationBell />

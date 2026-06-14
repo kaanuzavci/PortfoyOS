@@ -14,6 +14,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { allNavItems } from "@/lib/nav";
+import { useQuickAdd } from "@/components/forms/quick-add";
 import { Plus, Moon, Sun, Download } from "lucide-react";
 
 interface PaletteState {
@@ -34,17 +35,32 @@ export function CommandPalette() {
   const { isOpen, close, toggle } = useCommandPalette();
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
+  const openQuickAdd = useQuickAdd((s) => s.open);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         toggle();
+        return;
+      }
+      // Yazma alanlarında kısayolları yok say
+      const target = e.target as HTMLElement | null;
+      const typing =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
+      if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+      // "n" → yeni işlem
+      if (e.key.toLowerCase() === "n") {
+        e.preventDefault();
+        openQuickAdd();
       }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [toggle]);
+  }, [toggle, openQuickAdd]);
 
   const go = (href: string) => {
     close();
@@ -57,8 +73,16 @@ export function CommandPalette() {
       <CommandList>
         <CommandEmpty>Sonuç bulunamadı.</CommandEmpty>
         <CommandGroup heading="Hızlı eylem">
-          <CommandItem onSelect={() => go("/transactions?new=1")}>
+          <CommandItem
+            onSelect={() => {
+              close();
+              openQuickAdd();
+            }}
+          >
             <Plus className="mr-2 size-4" /> Yeni işlem ekle
+            <span className="ml-auto font-mono text-xs text-muted-foreground">
+              n
+            </span>
           </CommandItem>
           <CommandItem onSelect={() => go("/admin")}>
             <Plus className="mr-2 size-4" /> Yeni varlık ekle
