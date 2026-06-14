@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { usePortfolioStore } from "@/stores/portfolio-store";
+import { authHeaders } from "@/lib/firebase/client-tokens";
 import type { Asset } from "@/types";
 
 interface RefreshSummary {
@@ -22,7 +23,7 @@ async function fetchMarketPrices(
 ): Promise<PriceApiResult[]> {
   const res = await fetch("/api/prices", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify({ assets: items }),
   });
   if (!res.ok) throw new Error(`API ${res.status}`);

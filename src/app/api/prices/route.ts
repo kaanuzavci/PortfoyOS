@@ -2,6 +2,7 @@
 // (CORS'suz) güncel fiyatları çeker. Gizli anahtarlar yalnızca burada okunur.
 import { NextResponse } from "next/server";
 import { resolvePrice } from "@/lib/providers";
+import { guardApiRequest } from "@/lib/api-guard";
 import type { AssetType } from "@/types";
 
 export const runtime = "nodejs";
@@ -22,6 +23,10 @@ interface ResultRow {
 }
 
 export async function POST(req: Request) {
+  // Origin + hız sınırı + (canlıda) Firebase ID/App Check token doğrulaması.
+  const guard = await guardApiRequest(req);
+  if (!guard.ok) return guard.response;
+
   let assets: ReqAsset[];
   try {
     const body = (await req.json()) as { assets?: ReqAsset[] };

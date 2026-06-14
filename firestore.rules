@@ -1,22 +1,39 @@
 rules_version = '2';
 
 // PortföyOS — Firestore güvenlik kuralları.
-// Her kullanıcının verisi users/{uid}/** altında izole; yalnızca sahibi erişir.
-// Depo PUBLIC olduğu için bu kurallar zorunludur. Emulator ile test edilmeli.
+// Her kullanıcının verisi tek dokümanda: users/{uid}/data/portfolio (bkz. lib/firebase/sync.ts).
+// Depo PUBLIC olduğu için bu kurallar zorunludur. App Check enforcement konsoldan
+// ayrıca açılmalıdır (bkz. SECURITY.md). Emulator ile test edilmeli.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-
-      // Tüm alt koleksiyonlar (assets, transactions, priceSnapshots,
-      // macroSnapshots, alerts, alertRules, goals, ipos) yalnızca sahibe.
-      match /{document=**} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-      }
+    function signedInOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
     }
 
-    // Varsayılan: her şey reddedilir.
+    // Yazılan dokümanın makul sınırlar içinde ve beklenen şekilde olduğunu doğrular
+    // (kota/maliyet istismarına ve bozuk veriye karşı). Liste kontrolleri yalnızca
+    // ilgili alan mevcutsa çalışır; bu yüzden ileride eklenecek alanları kırmaz.
+    function isValidPortfolio() {
+      let d = request.resource.data;
+      return d.keys().size() <= 24
+        && (!('assets' in d) || d.assets is list)
+        && (!('transactions' in d) || d.transactions is list)
+        && (!('priceSnapshots' in d) || d.priceSnapshots is list)
+        && (!('macroSnapshots' in d) || d.macroSnapshots is list)
+        && (!('alerts' in d) || d.alerts is list)
+        && (!('alertRules' in d) || d.alertRules is list)
+        && (!('goals' in d) || d.goals is list)
+        && (!('ipos' in d) || d.ipos is list);
+    }
+
+    // Kullanıcının portföy doküman(lar)ı — YALNIZCA sahibi; yazımda şekil doğrulaması.
+    match /users/{uid}/data/{docId} {
+      allow read: if signedInOwner(uid);
+      allow write: if signedInOwner(uid) && isValidPortfolio();
+    }
+
+    // Varsayılan: diğer her şey reddedilir (kimse okuyamaz/yazamaz).
     match /{document=**} {
       allow read, write: if false;
     }
