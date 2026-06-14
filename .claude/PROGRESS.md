@@ -40,12 +40,19 @@ Son güncelleme: 2026-06-14
   disabled" döndürüyor → fonlar otomatik güncellenemiyor, manuel girilir. Yahoo/TCMB
   sorunsuz. İleride keyli bir fon kaynağı eklenebilir.
 
-## Sıradaki (opsiyonel / Firebase gerektirir)
-- ⏭️ **Faz 7 — Fiyat otomasyonu:** Cloud Functions cron + PriceProvider adapter'ları
-  (TEFAS/BIST/altın/döviz/TÜFE). Manuel girişe düşebilen tasarım.
-- ⏭️ **Firebase senkron:** store ↔ Firestore, App Check, FCM web push (Faz 8 kalanı).
-- ⏭️ **Faz 9 — Bitiş:** Vercel + Firebase deploy; `develop` → `main` merge + `v1.0.0`.
+- ✅ **Bulut senkron (Firebase):** `users/{uid}/data/portfolio` tek-doküman modeli;
+  gerçek zamanlı `onSnapshot` okuma + debounce'lu yazma; **çok cihaz senkronu**.
+  `useFirestoreSync` + `FirestoreSync` (layout'a monte). Firebase yoksa no-op (yerel mod).
+  `initializeFirestore(ignoreUndefinedProperties)`; ilk girişte yerel veri buluta taşınır.
+- ✅ **Production cila:** markalı 404, `metadataBase`.
+- ✅ **Yayın hazır:** `SETUP.md` (Firebase + Vercel tıkla-tıkla), `firebase.json`.
 
-> Not: Uygulama şu an **yerel demo modunda** tam çalışır. Firebase web config'i
-> `.env.local`'a eklenince gerçek auth + (senkron katmanı yazıldığında) bulut depolama
-> devreye girer. Gizli anahtarlar asla repoya girmez.
+## Yayına alma (kullanıcı adımları — SETUP.md)
+Kod tamamlandı. Kalan: kullanıcı Firebase projesi açıp web config'ini Vercel env'ine
+girip deploy edecek (SETUP.md). Bulut senkron canlı testi gerçek Firebase projesi gerektirir.
+
+## Sıradaki (opsiyonel)
+- ⏭️ App Check + FCM web push (bildirimleri cihaza push).
+- ⏭️ Cloud Functions cron ile sunucu-taraflı zamanlanmış fiyat snapshot'ı (şu an
+  istemci açılışında + istek üzerine yenileniyor).
+- ⏭️ TEFAS yerine keyli bir fon fiyat kaynağı.

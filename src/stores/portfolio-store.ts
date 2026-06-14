@@ -90,6 +90,8 @@ interface PortfolioState extends PortfolioData {
   exportData: () => PortfolioData;
   resetAll: () => void;
   loadSeed: (data: PortfolioData) => void;
+  /** Buluttan gelen tüm koleksiyonları yerel duruma yazar (senkron). */
+  hydrateFromCloud: (data: PortfolioData) => void;
 }
 
 const emptyData: PortfolioData = {
@@ -288,6 +290,17 @@ export const usePortfolioStore = create<PortfolioState>()(
       },
       resetAll: () => set({ ...emptyData, ...emptyEngineState }),
       loadSeed: (data) => set({ ...data, ...emptyEngineState }),
+      hydrateFromCloud: (data) =>
+        set({
+          assets: data.assets ?? [],
+          transactions: data.transactions ?? [],
+          priceSnapshots: data.priceSnapshots ?? [],
+          macroSnapshots: data.macroSnapshots ?? [],
+          alerts: data.alerts ?? [],
+          alertRules: data.alertRules ?? [],
+          goals: data.goals ?? [],
+          ipos: data.ipos ?? [],
+        }),
     }),
     {
       name: "portfoyos-data-v1",

@@ -3,7 +3,7 @@
 // Rules + App Check iledir. Üçüncü taraf API anahtarları ASLA buraya girmez.
 import { getApps, getApp, initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import { initializeFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -29,7 +29,9 @@ let dbInstance: Firestore | null = null;
 if (isFirebaseConfigured) {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   authInstance = getAuth(app);
-  dbInstance = getFirestore(app);
+  // ignoreUndefinedProperties: domain modellerindeki opsiyonel (undefined) alanlar
+  // Firestore yazımında hata vermesin diye.
+  dbInstance = initializeFirestore(app, { ignoreUndefinedProperties: true });
 }
 
 export const firebaseApp = app;

@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoyos.vercel.app",
+  ),
   title: {
     default: "PortföyOS — Kişisel Yatırım Takibi",
     template: "%s · PortföyOS",

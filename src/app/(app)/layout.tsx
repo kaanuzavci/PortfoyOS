@@ -7,6 +7,7 @@ import { NotificationEngine } from "@/components/notifications/notification-engi
 import { PageTransition } from "@/components/layout/page-transition";
 import { HowItWorksDialog } from "@/components/help/how-it-works-dialog";
 import { PriceAutoRefresh } from "@/components/system/price-auto-refresh";
+import { FirestoreSync } from "@/components/system/firestore-sync";
 
 export default function AppLayout({
   children,
@@ -28,6 +29,7 @@ export default function AppLayout({
         <NotificationEngine />
         <HowItWorksDialog />
         <PriceAutoRefresh />
+        <FirestoreSync />
       </div>
     </AuthGuard>
   );
