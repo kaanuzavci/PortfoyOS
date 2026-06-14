@@ -8,6 +8,17 @@ import { Progress } from "@/components/ui/progress";
 import { Target } from "lucide-react";
 import { formatTRY, formatPercent, formatDate } from "@/lib/format";
 
+const DAY = 86_400_000;
+
+/** XIRR büyüme varsayımıyla hedefe tahmini ulaşma tarihi. */
+function estimateReach(total: number, target: number, xirr: number | null, now: number) {
+  if (total >= target) return null;
+  if (!xirr || xirr <= 0) return null;
+  const years = Math.log(target / total) / Math.log(1 + xirr);
+  if (!Number.isFinite(years) || years > 100) return null;
+  return now + years * 365 * DAY;
+}
+
 export default function GoalsPage() {
   const pf = usePortfolio();
   const total = pf.summary.totalValue;
@@ -28,6 +39,7 @@ export default function GoalsPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           {pf.raw.goals.map((g) => {
             const ratio = g.targetAmount > 0 ? Math.min(1, total / g.targetAmount) : 0;
+            const reach = estimateReach(total, g.targetAmount, pf.summary.xirr, pf.now);
             return (
               <Card key={g.id}>
                 <CardContent className="p-5">
@@ -42,11 +54,18 @@ export default function GoalsPage() {
                     <span>{formatTRY(total)}</span>
                     <span>{formatTRY(g.targetAmount)}</span>
                   </div>
-                  {g.targetDate && (
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Hedef tarih: {formatDate(g.targetDate)}
-                    </p>
-                  )}
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    {g.targetDate && <span>Hedef: {formatDate(g.targetDate)}</span>}
+                    {ratio >= 1 ? (
+                      <span className="text-gain">Hedefe ulaşıldı 🎉</span>
+                    ) : reach ? (
+                      <span className="text-info">
+                        Tahmini ulaşma (XIRR): {formatDate(reach)}
+                      </span>
+                    ) : (
+                      <span>Tahmin için pozitif XIRR gerekir</span>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );

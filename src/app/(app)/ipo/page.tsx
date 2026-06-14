@@ -1,15 +1,53 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { usePortfolioStore } from "@/stores/portfolio-store";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Rocket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Rocket, CheckCircle2 } from "lucide-react";
 import { formatDate, formatTRY, formatPercent } from "@/lib/format";
+import { toast } from "sonner";
+import type { IpoEntry } from "@/types";
 
 export default function IpoPage() {
   const ipos = usePortfolioStore((s) => s.ipos);
+  const addAsset = usePortfolioStore((s) => s.addAsset);
+  const addTransaction = usePortfolioStore((s) => s.addTransaction);
+  const setManualPrice = usePortfolioStore((s) => s.setManualPrice);
+  const router = useRouter();
+
+  const participate = (ipo: IpoEntry) => {
+    const lot = ipo.lot && ipo.lot > 0 ? ipo.lot : 1;
+    const price = ipo.price ?? 0;
+    if (price <= 0) {
+      toast.error("Önce halka arz fiyatını gir (admin).");
+      return;
+    }
+    const asset = addAsset({
+      name: ipo.name,
+      ticker: ipo.ticker,
+      type: "halka_arz",
+      currency: "TRY",
+      priceSource: "manuel",
+      note: "Halka arz katılımı",
+    });
+    addTransaction({
+      assetId: asset.id,
+      side: "buy",
+      date: ipo.demandDate ?? Date.now(),
+      units: lot,
+      pricePerUnit: price,
+      note: "Halka arz",
+    });
+    setManualPrice(asset.id, price, ipo.demandDate ?? Date.now());
+    toast.success(`${ipo.ticker} portföye eklendi`, {
+      description: `${lot} lot × ${formatTRY(price)}`,
+    });
+    router.push(`/asset/${asset.id}`);
+  };
 
   return (
     <div>
@@ -48,6 +86,14 @@ export default function IpoPage() {
                     value={i.publicFloatPct ? formatPercent(i.publicFloatPct) : "—"}
                   />
                 </dl>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-4 w-full"
+                  onClick={() => participate(i)}
+                >
+                  <CheckCircle2 className="size-4" /> Katıldım — portföye ekle
+                </Button>
               </CardContent>
             </Card>
           ))}
