@@ -21,6 +21,8 @@ import { Change } from "@/components/shared/change";
 import { StreakBadge } from "@/components/dashboard/streak-badge";
 import { ValueAreaChart } from "@/components/charts/value-area-chart";
 import { TransactionForm } from "@/components/forms/transaction-form";
+import { RefreshPricesButton } from "@/components/forms/refresh-prices-button";
+import { StaleBadge } from "@/components/shared/stale-badge";
 import { snapTryPrice } from "@/lib/calc";
 import { formatTRY, formatNumber, formatDate } from "@/lib/format";
 import { ASSET_TYPE_LABELS } from "@/types";
@@ -86,8 +88,9 @@ export default function AssetDetailPage({
         title={a.name}
         description={`${a.ticker ?? ""} · ${ASSET_TYPE_LABELS[a.type]}${a.sector ? " · " + a.sector : ""}`}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <StreakBadge streak={pos.streak} />
+            <RefreshPricesButton variant="outline" />
             <TransactionForm
               defaultAssetId={a.id}
               trigger={
@@ -108,7 +111,11 @@ export default function AssetDetailPage({
           extra={<Change value={pos.totalReturnPct} kind="percent" size="sm" />}
         />
         <Stat label="Ort. Maliyet" value={formatTRY(pos.avgCost)} />
-        <Stat label="Güncel Fiyat" value={formatTRY(pos.latestPrice)} />
+        <Stat
+          label="Güncel Fiyat"
+          value={formatTRY(pos.latestPrice)}
+          extra={<StaleBadge latestDate={pos.latestPriceDate} />}
+        />
       </div>
 
       <Card>

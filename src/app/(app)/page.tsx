@@ -27,6 +27,7 @@ import { StreakStrip } from "@/components/dashboard/streak-strip";
 import { BenchmarkCard } from "@/components/dashboard/benchmark-card";
 import { SeedButton } from "@/components/dashboard/seed-button";
 import { Change } from "@/components/shared/change";
+import { RefreshPricesButton } from "@/components/forms/refresh-prices-button";
 
 export default function DashboardPage() {
   const pf = usePortfolio();
@@ -88,6 +89,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          Maliyet bazlı anlık durum
+        </p>
+        <RefreshPricesButton variant="ghost" />
+      </div>
+
       {/* KPI satırı */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard

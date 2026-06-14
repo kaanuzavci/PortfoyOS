@@ -7,6 +7,8 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { AssetForm } from "@/components/forms/asset-form";
 import { ManualPriceRow } from "@/components/forms/manual-price-row";
 import { MacroForm } from "@/components/forms/macro-form";
+import { RefreshPricesButton } from "@/components/forms/refresh-prices-button";
+import { StaleBadge } from "@/components/shared/stale-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -102,12 +104,15 @@ export default function AdminPage() {
         {/* FİYATLAR */}
         <TabsContent value="prices">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Manuel fiyat güncelleme</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Her varlık için bugünkü birim fiyatı gir. Manuel giriş her zaman
-                birinci sınıf yoldur.
-              </p>
+            <CardHeader className="flex flex-row items-start justify-between gap-3">
+              <div>
+                <CardTitle className="text-base">Fiyat güncelleme</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Otomatik çek (TEFAS/BIST/kur) ya da her varlık için elle gir.
+                  Manuel giriş her zaman birinci sınıf yoldur.
+                </p>
+              </div>
+              <RefreshPricesButton />
             </CardHeader>
             <CardContent className="space-y-2">
               {activeAssets.length === 0 ? (
@@ -193,7 +198,10 @@ function AssetsTable({
                   <Badge variant="outline">{ASSET_TYPE_LABELS[a.type]}</Badge>
                 </TableCell>
                 <TableCell className="text-right font-mono tabular">
-                  {latest ? formatTRY(latest.price) : "—"}
+                  <div className="flex items-center justify-end gap-2">
+                    <StaleBadge latestDate={latest?.date ?? null} />
+                    {latest ? formatTRY(latest.price) : "—"}
+                  </div>
                 </TableCell>
                 <TableCell className="text-right font-mono text-xs tabular text-muted-foreground">
                   {a.targetPrice ? formatTRY(a.targetPrice) : "—"} /{" "}

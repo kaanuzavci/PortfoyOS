@@ -44,6 +44,8 @@ interface PortfolioState extends PortfolioData {
   addPriceSnapshot: (p: Omit<PriceSnapshot, "id">) => PriceSnapshot;
   /** Bir varlık için bugünün fiyatını manuel olarak günceller (yeni snapshot). */
   setManualPrice: (assetId: string, price: number, date?: number) => void;
+  /** Otomatik (sağlayıcı) kaynaklı fiyat günceller; kaynak etiketi taşır. */
+  setAutoPrice: (assetId: string, price: number, source: string, date?: number) => void;
   deletePriceSnapshot: (id: string) => void;
 
   // Macro
@@ -170,30 +172,10 @@ export const usePortfolioStore = create<PortfolioState>()(
         set((s) => ({ priceSnapshots: [...s.priceSnapshots, snap] }));
         return snap;
       },
-      setManualPrice: (assetId, price, date = Date.now()) => {
-        const day = startOfDay(date);
-        set((s) => {
-          // Aynı güne ait varsa üzerine yaz, yoksa ekle
-          const existing = s.priceSnapshots.find(
-            (p) => p.assetId === assetId && startOfDay(p.date) === day,
-          );
-          if (existing) {
-            return {
-              priceSnapshots: s.priceSnapshots.map((p) =>
-                p.id === existing.id ? { ...p, price, source: "manuel" } : p,
-              ),
-            };
-          }
-          const snap: PriceSnapshot = {
-            id: uid(),
-            assetId,
-            date,
-            price,
-            source: "manuel",
-          };
-          return { priceSnapshots: [...s.priceSnapshots, snap] };
-        });
-      },
+      setManualPrice: (assetId, price, date = Date.now()) =>
+        upsertPrice(set, assetId, price, "manuel", date),
+      setAutoPrice: (assetId, price, source, date = Date.now()) =>
+        upsertPrice(set, assetId, price, source, date),
       deletePriceSnapshot: (id) =>
         set((s) => ({
           priceSnapshots: s.priceSnapshots.filter((p) => p.id !== id),
@@ -335,4 +317,31 @@ function startOfDay(ms: number): number {
   const d = new Date(ms);
   d.setHours(0, 0, 0, 0);
   return d.getTime();
+}
+
+type SetFn = (fn: (s: PortfolioState) => Partial<PortfolioState>) => void;
+
+/** Aynı güne ait fiyat varsa üzerine yazar, yoksa yeni snapshot ekler. */
+function upsertPrice(
+  set: SetFn,
+  assetId: string,
+  price: number,
+  source: string,
+  date: number,
+) {
+  const day = startOfDay(date);
+  set((s) => {
+    const existing = s.priceSnapshots.find(
+      (p) => p.assetId === assetId && startOfDay(p.date) === day,
+    );
+    if (existing) {
+      return {
+        priceSnapshots: s.priceSnapshots.map((p) =>
+          p.id === existing.id ? { ...p, price, source } : p,
+        ),
+      };
+    }
+    const snap: PriceSnapshot = { id: uid(), assetId, date, price, source };
+    return { priceSnapshots: [...s.priceSnapshots, snap] };
+  });
 }

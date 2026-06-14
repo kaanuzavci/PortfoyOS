@@ -6,6 +6,7 @@ import { QuickAddTransaction } from "@/components/forms/quick-add";
 import { NotificationEngine } from "@/components/notifications/notification-engine";
 import { PageTransition } from "@/components/layout/page-transition";
 import { HowItWorksDialog } from "@/components/help/how-it-works-dialog";
+import { PriceAutoRefresh } from "@/components/system/price-auto-refresh";
 
 export default function AppLayout({
   children,
@@ -26,6 +27,7 @@ export default function AppLayout({
         <QuickAddTransaction />
         <NotificationEngine />
         <HowItWorksDialog />
+        <PriceAutoRefresh />
       </div>
     </AuthGuard>
   );
