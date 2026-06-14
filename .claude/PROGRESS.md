@@ -23,9 +23,22 @@ Son güncelleme: 2026-06-14
 - ✅ **Faz 8 (kısmi) — Cila:** Framer Motion sayfa geçişleri + KPI/login girişleri;
   count-up; PWA manifest + ikon; ⌘K + "n" kısayolu.
 
+- ✅ **Uygulama içi rehber:** InfoHint (tooltip) ipuçları; "Nasıl çalışır?" dialogu
+  (model + kavram sözlüğü); ilk girişte otomatik açılır; topbar ? + ⌘K girişi.
+- ✅ **Faz 7 — Otomatik fiyat çekme (Firebase'siz):** Next.js `/api/prices` Route
+  Handler + PriceProvider'lar. **Hisse (Yahoo .IS), Döviz (TCMB), Kripto, Altın
+  canlı çalışıyor.** Fon (TEFAS) endpoint'i değişti (ERR-006) → **manuele düşüyor**
+  (zarif fallback + "güncel değil" rozeti). "Fiyatları güncelle" butonu + açılışta
+  12 saatte bir otomatik yenileme.
+
 ## Durum
-- `npm run build` ✅ · `npm test` ✅ (45) · `npm run typecheck` ✅
+- `npm run build` ✅ · `npm test` ✅ (56) · `npm run typecheck` ✅
 - Git: `main` (scaffold) + `develop` (tüm iş) GitHub'a push edildi.
+
+## Bilinen kısıt
+- TEFAS fon fiyat API'si (BindHistoryInfo) şu an anonim erişime "Method not found or
+  disabled" döndürüyor → fonlar otomatik güncellenemiyor, manuel girilir. Yahoo/TCMB
+  sorunsuz. İleride keyli bir fon kaynağı eklenebilir.
 
 ## Sıradaki (opsiyonel / Firebase gerektirir)
 - ⏭️ **Faz 7 — Fiyat otomasyonu:** Cloud Functions cron + PriceProvider adapter'ları
