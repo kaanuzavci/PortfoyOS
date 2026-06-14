@@ -7,6 +7,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { compactSnapshots } from "@/lib/calc/compact";
+import { DEFAULT_TAX_RATES, type TaxRates } from "@/lib/calc/tax";
 import type {
   Asset,
   Transaction,
@@ -75,6 +76,8 @@ interface PortfolioState extends PortfolioData {
   setLastPriceFetch: (t: number) => void;
   costMethod: "average" | "fifo";
   setCostMethod: (m: "average" | "fifo") => void;
+  taxRates: TaxRates;
+  setTaxRate: (type: keyof TaxRates, rate: number) => void;
 
   // Alert rules
   upsertAlertRule: (r: AlertRule) => void;
@@ -126,6 +129,9 @@ export const usePortfolioStore = create<PortfolioState>()(
       setLastPriceFetch: (t) => set({ lastPriceFetch: t }),
       costMethod: "average",
       setCostMethod: (m) => set({ costMethod: m }),
+      taxRates: { ...DEFAULT_TAX_RATES },
+      setTaxRate: (type, rate) =>
+        set((s) => ({ taxRates: { ...s.taxRates, [type]: rate } })),
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
 
@@ -334,6 +340,7 @@ export const usePortfolioStore = create<PortfolioState>()(
         onboardingSeen: s.onboardingSeen,
         lastPriceFetch: s.lastPriceFetch,
         costMethod: s.costMethod,
+        taxRates: s.taxRates,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

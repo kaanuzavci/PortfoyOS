@@ -23,6 +23,7 @@ import { ValueAreaChart } from "@/components/charts/value-area-chart";
 import { TransactionForm } from "@/components/forms/transaction-form";
 import { RefreshPricesButton } from "@/components/forms/refresh-prices-button";
 import { StaleBadge } from "@/components/shared/stale-badge";
+import { TaxEstimateCard } from "@/components/asset/tax-estimate-card";
 import { snapTryPrice } from "@/lib/calc";
 import { formatTRY, formatNumber, formatDate } from "@/lib/format";
 import { ASSET_TYPE_LABELS } from "@/types";
@@ -160,6 +161,8 @@ export default function AssetDetailPage({
           )}
         </div>
       )}
+
+      <TaxEstimateCard position={pos} />
 
       <Card>
         <CardHeader>
