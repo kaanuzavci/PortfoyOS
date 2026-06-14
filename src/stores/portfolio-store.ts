@@ -52,9 +52,16 @@ interface PortfolioState extends PortfolioData {
 
   // Alerts
   addAlert: (a: Omit<Alert, "id" | "createdAt" | "isRead">) => Alert;
+  /** Bildirim motoru için: aynı key daha önce üretilmişse null döner (spam yok). */
+  emitAlert: (key: string, a: Omit<Alert, "id" | "createdAt" | "isRead">) => Alert | null;
   markAlertRead: (id: string) => void;
   markAllAlertsRead: () => void;
   clearAlerts: () => void;
+
+  // Bildirim motoru durumu
+  seenAlertKeys: string[];
+  streakMemory: Record<string, { dir: string; length: number }>;
+  setStreakMemory: (m: Record<string, { dir: string; length: number }>) => void;
 
   // Alert rules
   upsertAlertRule: (r: AlertRule) => void;
@@ -88,10 +95,16 @@ const emptyData: PortfolioData = {
   ipos: [],
 };
 
+const emptyEngineState = {
+  seenAlertKeys: [] as string[],
+  streakMemory: {} as Record<string, { dir: string; length: number }>,
+};
+
 export const usePortfolioStore = create<PortfolioState>()(
   persist(
     (set, get) => ({
       ...emptyData,
+      ...emptyEngineState,
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
 
@@ -196,6 +209,21 @@ export const usePortfolioStore = create<PortfolioState>()(
         set((s) => ({ alerts: [alert, ...s.alerts] }));
         return alert;
       },
+      emitAlert: (key, a) => {
+        if (get().seenAlertKeys.includes(key)) return null;
+        const alert: Alert = {
+          ...a,
+          id: uid(),
+          isRead: false,
+          createdAt: Date.now(),
+        };
+        set((s) => ({
+          alerts: [alert, ...s.alerts],
+          seenAlertKeys: [...s.seenAlertKeys, key],
+        }));
+        return alert;
+      },
+      setStreakMemory: (m) => set({ streakMemory: m }),
       markAlertRead: (id) =>
         set((s) => ({
           alerts: s.alerts.map((a) =>
@@ -266,8 +294,8 @@ export const usePortfolioStore = create<PortfolioState>()(
           ipos: s.ipos,
         };
       },
-      resetAll: () => set({ ...emptyData }),
-      loadSeed: (data) => set({ ...data }),
+      resetAll: () => set({ ...emptyData, ...emptyEngineState }),
+      loadSeed: (data) => set({ ...data, ...emptyEngineState }),
     }),
     {
       name: "portfoyos-data-v1",
@@ -281,6 +309,8 @@ export const usePortfolioStore = create<PortfolioState>()(
         alertRules: s.alertRules,
         goals: s.goals,
         ipos: s.ipos,
+        seenAlertKeys: s.seenAlertKeys,
+        streakMemory: s.streakMemory,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

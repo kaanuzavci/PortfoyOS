@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { QuickAddTransaction } from "@/components/forms/quick-add";
+import { NotificationEngine } from "@/components/notifications/notification-engine";
 
 export default function AppLayout({
   children,
@@ -19,6 +20,7 @@ export default function AppLayout({
         </div>
         <CommandPalette />
         <QuickAddTransaction />
+        <NotificationEngine />
       </div>
     </AuthGuard>
   );
