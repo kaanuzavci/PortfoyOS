@@ -15,6 +15,7 @@ export interface UsePortfolioResult extends PortfolioComputed {
 /** Store'dan ham veriyi okur ve hesaplama motorundan türetilmiş metrikleri verir. */
 export function usePortfolio(): UsePortfolioResult {
   const hydrated = usePortfolioStore((s) => s._hasHydrated);
+  const costMethod = usePortfolioStore((s) => s.costMethod);
   const assets = usePortfolioStore((s) => s.assets);
   const transactions = usePortfolioStore((s) => s.transactions);
   const priceSnapshots = usePortfolioStore((s) => s.priceSnapshots);
@@ -47,7 +48,10 @@ export function usePortfolio(): UsePortfolioResult {
     return dates.length ? Math.max(Date.now(), ...dates) : Date.now();
   }, [priceSnapshots, transactions]);
 
-  const computed = useMemo(() => computePortfolio(raw, now), [raw, now]);
+  const computed = useMemo(
+    () => computePortfolio(raw, now, costMethod),
+    [raw, now, costMethod],
+  );
 
   return {
     ...computed,

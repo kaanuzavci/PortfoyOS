@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { PageHeader } from "@/components/shared/page-header";
 import { SeedButton } from "@/components/dashboard/seed-button";
 import { AlertRulesCard } from "@/components/notifications/alert-rules-card";
+import { CostMethodCard } from "@/components/settings/cost-method-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -130,6 +131,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        <CostMethodCard />
         <AlertRulesCard />
       </div>
     </div>

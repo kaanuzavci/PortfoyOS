@@ -1,7 +1,13 @@
 // Üst düzey portföy toplayıcı — ham veriden (varlık + işlem + fiyat + makro)
 // dashboard'un ihtiyaç duyduğu tüm metrikleri türetir. SAF.
 import type { Asset, AssetType, PortfolioData } from "@/types";
-import { computePosition, latestPriceOf, snapTryPrice, type PositionResult } from "./position";
+import {
+  computePosition,
+  latestPriceOf,
+  snapTryPrice,
+  type PositionResult,
+  type CostMethod,
+} from "./position";
 import { portfolioValueSeries, type ValuePoint } from "./timeseries";
 import { xirr, type CashFlow } from "./xirr";
 import { detectStreak, type StreakResult } from "./streak";
@@ -62,6 +68,7 @@ const TYPE_LABELS: Record<AssetType, string> = {
 export function computePortfolio(
   data: PortfolioData,
   now: number = Date.now(),
+  method: CostMethod = "average",
 ): PortfolioComputed {
   const { assets, transactions, priceSnapshots, macroSnapshots } = data;
   const visibleAssets = assets.filter((a) => !a.isArchived);
@@ -81,7 +88,7 @@ export function computePortfolio(
   }
 
   const positions: AssetPosition[] = visibleAssets.map((asset) => {
-    const pos = computePosition(asset.id, transactions, priceSnapshots, now);
+    const pos = computePosition(asset.id, transactions, priceSnapshots, now, method);
     const snaps = snapsByAsset.get(asset.id) ?? [];
     const streak = detectStreak(snaps.map((s) => s.price));
 

@@ -53,21 +53,21 @@ export function latestPriceOf(
  * Ağırlıklı ortalama maliyet yöntemi; alış masrafı maliyete eklenir,
  * satış masrafı hasılattan düşülür.
  */
-export function computePosition(
-  assetId: string,
-  transactions: Transaction[],
-  snapshots: PriceSnapshot[],
-  asOf?: number,
-): PositionResult {
-  const txs = transactions
-    .filter((t) => t.assetId === assetId && (asOf == null || t.date <= asOf))
-    .sort((a, b) => a.date - b.date || a.createdAt - b.createdAt);
+export type CostMethod = "average" | "fifo";
 
+interface CostState {
+  runningUnits: number;
+  runningCost: number;
+  realizedPnl: number;
+  totalInvested: number;
+}
+
+/** Ağırlıklı ortalama: satışta adetler o anki ortalama maliyetten düşülür. */
+function processAverage(txs: Transaction[]): CostState {
   let runningUnits = 0;
-  let runningCost = 0; // elde tutulan adetlerin toplam TRY maliyeti
+  let runningCost = 0;
   let realizedPnl = 0;
   let totalInvested = 0;
-
   for (const t of txs) {
     const price = txTryPrice(t);
     const fee = t.fee ?? 0;
@@ -84,6 +84,55 @@ export function computePosition(
       runningUnits -= soldUnits;
     }
   }
+  return { runningUnits, runningCost, realizedPnl, totalInvested };
+}
+
+/** FIFO: ilk alınan ilk satılır; satılan adetlerin maliyeti en eski lotlardan düşülür. */
+function processFifo(txs: Transaction[]): CostState {
+  const lots: { units: number; costPerUnit: number }[] = [];
+  let realizedPnl = 0;
+  let totalInvested = 0;
+  for (const t of txs) {
+    const price = txTryPrice(t);
+    const fee = t.fee ?? 0;
+    if (t.side === "buy") {
+      // Alış masrafı o lotun maliyetine eklenir.
+      const costPerUnit = t.units > 0 ? (t.units * price + fee) / t.units : price;
+      lots.push({ units: t.units, costPerUnit });
+      totalInvested += t.units * price + fee;
+    } else {
+      let toSell = Math.min(t.units, lots.reduce((s, l) => s + l.units, 0));
+      const proceeds = toSell * price - fee;
+      let costOfSold = 0;
+      while (toSell > 1e-9 && lots.length > 0) {
+        const lot = lots[0];
+        const take = Math.min(lot.units, toSell);
+        costOfSold += take * lot.costPerUnit;
+        lot.units -= take;
+        toSell -= take;
+        if (lot.units <= 1e-9) lots.shift();
+      }
+      realizedPnl += proceeds - costOfSold;
+    }
+  }
+  const runningUnits = lots.reduce((s, l) => s + l.units, 0);
+  const runningCost = lots.reduce((s, l) => s + l.units * l.costPerUnit, 0);
+  return { runningUnits, runningCost, realizedPnl, totalInvested };
+}
+
+export function computePosition(
+  assetId: string,
+  transactions: Transaction[],
+  snapshots: PriceSnapshot[],
+  asOf?: number,
+  method: CostMethod = "average",
+): PositionResult {
+  const txs = transactions
+    .filter((t) => t.assetId === assetId && (asOf == null || t.date <= asOf))
+    .sort((a, b) => a.date - b.date || a.createdAt - b.createdAt);
+
+  const { runningUnits, runningCost, realizedPnl, totalInvested } =
+    method === "fifo" ? processFifo(txs) : processAverage(txs);
 
   const heldUnits = round(runningUnits);
   const avgCost = runningUnits > 0 ? runningCost / runningUnits : 0;

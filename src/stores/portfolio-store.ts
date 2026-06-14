@@ -65,11 +65,13 @@ interface PortfolioState extends PortfolioData {
   streakMemory: Record<string, { dir: string; length: number }>;
   setStreakMemory: (m: Record<string, { dir: string; length: number }>) => void;
 
-  // Arayüz durumu
+  // Arayüz / hesaplama tercihleri
   onboardingSeen: boolean;
   setOnboardingSeen: (v: boolean) => void;
   lastPriceFetch: number;
   setLastPriceFetch: (t: number) => void;
+  costMethod: "average" | "fifo";
+  setCostMethod: (m: "average" | "fifo") => void;
 
   // Alert rules
   upsertAlertRule: (r: AlertRule) => void;
@@ -119,6 +121,8 @@ export const usePortfolioStore = create<PortfolioState>()(
       onboardingSeen: false,
       setOnboardingSeen: (v) => set({ onboardingSeen: v }),
       setLastPriceFetch: (t) => set({ lastPriceFetch: t }),
+      costMethod: "average",
+      setCostMethod: (m) => set({ costMethod: m }),
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
 
@@ -318,6 +322,7 @@ export const usePortfolioStore = create<PortfolioState>()(
         streakMemory: s.streakMemory,
         onboardingSeen: s.onboardingSeen,
         lastPriceFetch: s.lastPriceFetch,
+        costMethod: s.costMethod,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
