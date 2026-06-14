@@ -110,6 +110,7 @@ export default function DashboardPage() {
           tone={s.totalPnl >= 0 ? "gain" : "loss"}
           delta={{ value: s.totalReturnPct, kind: "percent" }}
           subtext="maliyete göre"
+          hint="Gerçekleşen (sattıklarından) + gerçekleşmemiş (elindekilerden) kâr/zarar toplamı. (Güncel fiyat − ortalama maliyet) × adet mantığıyla hesaplanır."
         />
         <KpiCard
           index={2}
@@ -119,6 +120,7 @@ export default function DashboardPage() {
           icon={Percent}
           tone={s.realReturnPct >= 0 ? "gain" : "loss"}
           subtext={`enflasyon ${formatPercent(s.inflation)}`}
+          hint="Enflasyondan arındırılmış gerçek getirin. Nominal getiri pozitif olsa bile enflasyon daha yüksekse reel getiri negatif olabilir. Makro veri (TÜFE) admin'den girilir."
         />
         <KpiCard
           index={3}
@@ -128,6 +130,7 @@ export default function DashboardPage() {
           icon={Activity}
           tone={(s.xirr ?? 0) >= 0 ? "gain" : "loss"}
           subtext="nakit akışı bazlı"
+          hint="Düzensiz alış/satışları tarihleriyle dikkate alan yıllıklandırılmış getiri. Farklı zamanlarda para eklediğinde 'gerçek yıllık verim' budur."
         />
       </div>
 

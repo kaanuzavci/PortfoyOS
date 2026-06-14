@@ -5,6 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import { CountUp } from "@/components/shared/count-up";
 import { Change } from "@/components/shared/change";
 import { Sparkline } from "@/components/charts/sparkline";
+import { InfoHint } from "@/components/shared/info-hint";
 import { cn } from "@/lib/utils";
 
 type Tone = "gain" | "loss" | "neutral" | "accent";
@@ -25,6 +26,7 @@ export function KpiCard({
   delta,
   subtext,
   spark,
+  hint,
   index = 0,
 }: {
   label: string;
@@ -35,6 +37,7 @@ export function KpiCard({
   delta?: { value: number; kind: "percent" | "currency" };
   subtext?: string;
   spark?: number[];
+  hint?: string;
   index?: number;
 }) {
   return (
@@ -53,7 +56,10 @@ export function KpiCard({
       />
 
       <div className="relative flex items-start justify-between">
-        <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+        <p className="flex items-center gap-1 text-[13px] font-medium text-muted-foreground">
+          {label}
+          {hint && <InfoHint>{hint}</InfoHint>}
+        </p>
         <span
           className="flex size-8 items-center justify-center rounded-lg border border-border bg-background/40"
           style={{ color: toneColor[tone] }}

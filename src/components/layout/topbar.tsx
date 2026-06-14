@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search, LogOut, User2, Plus } from "lucide-react";
+import { Menu, Search, LogOut, User2, Plus, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -22,6 +22,7 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { allNavItems } from "@/lib/nav";
 import { useCommandPalette } from "@/components/layout/command-palette";
 import { useQuickAdd } from "@/components/forms/quick-add";
+import { useHelpDialog } from "@/components/help/how-it-works-dialog";
 
 function usePageTitle() {
   const pathname = usePathname();
@@ -37,6 +38,7 @@ export function Topbar() {
   const { user, signOut } = useAuth();
   const openPalette = useCommandPalette((s) => s.open);
   const openQuickAdd = useQuickAdd((s) => s.open);
+  const openHelp = useHelpDialog((s) => s.open);
 
   const initials =
     user?.displayName?.slice(0, 2).toUpperCase() ??
@@ -85,6 +87,15 @@ export function Topbar() {
           <Plus className="size-4" /> İşlem
         </Button>
 
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Nasıl çalışır?"
+          onClick={openHelp}
+          className="text-muted-foreground"
+        >
+          <HelpCircle className="size-[18px]" />
+        </Button>
         <NotificationBell />
         <ThemeToggle />
 

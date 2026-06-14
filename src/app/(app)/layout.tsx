@@ -5,6 +5,7 @@ import { CommandPalette } from "@/components/layout/command-palette";
 import { QuickAddTransaction } from "@/components/forms/quick-add";
 import { NotificationEngine } from "@/components/notifications/notification-engine";
 import { PageTransition } from "@/components/layout/page-transition";
+import { HowItWorksDialog } from "@/components/help/how-it-works-dialog";
 
 export default function AppLayout({
   children,
@@ -24,6 +25,7 @@ export default function AppLayout({
         <CommandPalette />
         <QuickAddTransaction />
         <NotificationEngine />
+        <HowItWorksDialog />
       </div>
     </AuthGuard>
   );

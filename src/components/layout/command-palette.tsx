@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/command";
 import { allNavItems } from "@/lib/nav";
 import { useQuickAdd } from "@/components/forms/quick-add";
-import { Plus, Moon, Sun, Download } from "lucide-react";
+import { useHelpDialog } from "@/components/help/how-it-works-dialog";
+import { Plus, Moon, Sun, Download, HelpCircle } from "lucide-react";
 
 interface PaletteState {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export function CommandPalette() {
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
   const openQuickAdd = useQuickAdd((s) => s.open);
+  const openHelp = useHelpDialog((s) => s.open);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -89,6 +91,14 @@ export function CommandPalette() {
           </CommandItem>
           <CommandItem onSelect={() => go("/settings#backup")}>
             <Download className="mr-2 size-4" /> Yedek indir
+          </CommandItem>
+          <CommandItem
+            onSelect={() => {
+              close();
+              openHelp();
+            }}
+          >
+            <HelpCircle className="mr-2 size-4" /> Nasıl çalışır?
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />

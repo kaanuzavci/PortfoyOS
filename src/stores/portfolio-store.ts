@@ -63,6 +63,12 @@ interface PortfolioState extends PortfolioData {
   streakMemory: Record<string, { dir: string; length: number }>;
   setStreakMemory: (m: Record<string, { dir: string; length: number }>) => void;
 
+  // Arayüz durumu
+  onboardingSeen: boolean;
+  setOnboardingSeen: (v: boolean) => void;
+  lastPriceFetch: number;
+  setLastPriceFetch: (t: number) => void;
+
   // Alert rules
   upsertAlertRule: (r: AlertRule) => void;
   deleteAlertRule: (id: string) => void;
@@ -98,6 +104,7 @@ const emptyData: PortfolioData = {
 const emptyEngineState = {
   seenAlertKeys: [] as string[],
   streakMemory: {} as Record<string, { dir: string; length: number }>,
+  lastPriceFetch: 0,
 };
 
 export const usePortfolioStore = create<PortfolioState>()(
@@ -105,6 +112,9 @@ export const usePortfolioStore = create<PortfolioState>()(
     (set, get) => ({
       ...emptyData,
       ...emptyEngineState,
+      onboardingSeen: false,
+      setOnboardingSeen: (v) => set({ onboardingSeen: v }),
+      setLastPriceFetch: (t) => set({ lastPriceFetch: t }),
       _hasHydrated: false,
       setHasHydrated: (v) => set({ _hasHydrated: v }),
 
@@ -311,6 +321,8 @@ export const usePortfolioStore = create<PortfolioState>()(
         ipos: s.ipos,
         seenAlertKeys: s.seenAlertKeys,
         streakMemory: s.streakMemory,
+        onboardingSeen: s.onboardingSeen,
+        lastPriceFetch: s.lastPriceFetch,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

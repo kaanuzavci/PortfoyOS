@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "./date-picker";
+import { InfoHint } from "@/components/shared/info-hint";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatTRY } from "@/lib/format";
@@ -209,8 +210,15 @@ export function TransactionForm({
 
             {!isEdit && (
               <div className="flex items-center justify-between">
-                <Label htmlFor="t-alsoprice" className="text-sm font-normal">
+                <Label
+                  htmlFor="t-alsoprice"
+                  className="flex items-center gap-1 text-sm font-normal"
+                >
                   Bu fiyatı güncel fiyat olarak da kaydet
+                  <InfoHint>
+                    Açıkken işlem fiyatın aynı zamanda &quot;bugünkü güncel
+                    fiyat&quot; olarak kaydedilir; dashboard değeri hemen güncellenir.
+                  </InfoHint>
                 </Label>
                 <Switch
                   id="t-alsoprice"

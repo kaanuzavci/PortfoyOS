@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Change } from "@/components/shared/change";
+import { InfoHint } from "@/components/shared/info-hint";
 import type { BenchmarkResult } from "@/lib/calc";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +16,14 @@ export function BenchmarkCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Kıyaslama</CardTitle>
+        <CardTitle className="flex items-center gap-1.5 text-base">
+          Kıyaslama
+          <InfoHint>
+            Aynı tarihlerde aynı parayı BIST/altın/dolar/mevduata koysaydın ne
+            olurdu? Senin getirinle karşılaştırır. &quot;Geçtin&quot; = o
+            alternatiften iyisin.
+          </InfoHint>
+        </CardTitle>
         <p className="text-xs text-muted-foreground">
           Aynı parayı şuralara koysaydın
         </p>

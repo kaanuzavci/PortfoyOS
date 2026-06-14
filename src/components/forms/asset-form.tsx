@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { InfoHint } from "@/components/shared/info-hint";
 import { toast } from "sonner";
 import { ASSET_TYPE_LABELS, type Asset, type AssetType, type Currency } from "@/types";
 
@@ -174,7 +175,13 @@ export function AssetForm({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="a-target">Hedef fiyat</Label>
+              <Label htmlFor="a-target" className="flex items-center gap-1">
+                Hedef fiyat
+                <InfoHint>
+                  &quot;Buraya gelirse iyi olur&quot; seviyen. Hesaba katılmaz;
+                  fiyat ulaşınca sadece bildirim gelir. Boş bırakabilirsin.
+                </InfoHint>
+              </Label>
               <Input
                 id="a-target"
                 type="number"
@@ -185,7 +192,13 @@ export function AssetForm({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="a-stop">Stop-loss</Label>
+              <Label htmlFor="a-stop" className="flex items-center gap-1">
+                Stop-loss
+                <InfoHint>
+                  &quot;Bunun altına inerse zarar keseyim&quot; seviyen. Hesaba
+                  katılmaz; fiyat inince uyarı bildirimi gelir.
+                </InfoHint>
+              </Label>
               <Input
                 id="a-stop"
                 type="number"

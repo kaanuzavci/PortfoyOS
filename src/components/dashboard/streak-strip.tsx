@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StreakBadge } from "./streak-badge";
+import { InfoHint } from "@/components/shared/info-hint";
 import type { AssetPosition, StreakResult } from "@/lib/calc";
 
 export function StreakStrip({
@@ -20,7 +21,14 @@ export function StreakStrip({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Aktif seriler</CardTitle>
+        <CardTitle className="flex items-center gap-1.5 text-base">
+          Aktif seriler
+          <InfoHint>
+            Üst üste artış (kâr) veya azalış (zarar) günleri. 3 günde
+            &quot;Kıvılcım/Dikkat&quot;, 5 günde &quot;Momentum/Uyarı&quot;…
+            Yön değişince seri sıfırlanır.
+          </InfoHint>
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-wrap items-center gap-2">
         <StreakBadge streak={portfolioStreak} label="Portföy" />
