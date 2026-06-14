@@ -14,8 +14,17 @@ export function PriceAutoRefresh() {
   const hydrated = usePortfolioStore((s) => s._hasHydrated);
   const lastPriceFetch = usePortfolioStore((s) => s.lastPriceFetch);
   const assetCount = usePortfolioStore((s) => s.assets.length);
+  const compactPrices = usePortfolioStore((s) => s.compactPrices);
   const { refresh } = usePriceRefresh();
   const ran = useRef(false);
+  const compacted = useRef(false);
+
+  // Açılışta bir kez fiyat geçmişini sıkıştır (1 MB sınırını uzakta tut).
+  useEffect(() => {
+    if (compacted.current || !hydrated) return;
+    compacted.current = true;
+    compactPrices();
+  }, [hydrated, compactPrices]);
 
   useEffect(() => {
     if (ran.current || !hydrated || assetCount === 0) return;

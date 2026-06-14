@@ -6,4 +6,5 @@ export * from "./real-return";
 export * from "./benchmark";
 export * from "./streak";
 export * from "./tax";
+export * from "./compact";
 export * from "./portfolio";

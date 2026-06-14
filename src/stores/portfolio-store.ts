@@ -6,6 +6,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { compactSnapshots } from "@/lib/calc/compact";
 import type {
   Asset,
   Transaction,
@@ -47,6 +48,8 @@ interface PortfolioState extends PortfolioData {
   /** Otomatik (sağlayıcı) kaynaklı fiyat günceller; kaynak etiketi taşır. */
   setAutoPrice: (assetId: string, price: number, source: string, date?: number) => void;
   deletePriceSnapshot: (id: string) => void;
+  /** Fiyat geçmişini kademeli sıkıştırır (1 MB sınırına takılmamak için). */
+  compactPrices: (now?: number) => void;
 
   // Macro
   addMacroSnapshot: (m: Omit<MacroSnapshot, "id">) => MacroSnapshot;
@@ -186,6 +189,14 @@ export const usePortfolioStore = create<PortfolioState>()(
         set((s) => ({
           priceSnapshots: s.priceSnapshots.filter((p) => p.id !== id),
         })),
+      compactPrices: (now = Date.now()) =>
+        set((s) => {
+          const compacted = compactSnapshots(s.priceSnapshots, now);
+          // Yalnızca gerçekten küçüldüyse yaz (gereksiz senkron tetikleme).
+          return compacted.length < s.priceSnapshots.length
+            ? { priceSnapshots: compacted }
+            : {};
+        }),
 
       addMacroSnapshot: (m) => {
         const snap: MacroSnapshot = { ...m, id: uid() };
