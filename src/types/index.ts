@@ -33,7 +33,16 @@ export interface Asset {
   currency: Currency;
   sector?: string;
   tags?: string[];
-  priceSource?: string; // "manuel" | "tefas" | "bist" | ...
+  priceSource?: string; // "manuel" | "tefas" | "yahoo" | "truncgil" | "banka" ...
+  /**
+   * Fiyat güncelleme modu:
+   * - "auto" (varsayılan): otomatik çekilen piyasa fiyatı aynen kullanılır.
+   * - "spread": piyasa × (1 + spreadPct) — banka makası uygulanır (kalibre edilir).
+   * - "manual": otomatik güncelleme bu varlığa dokunmaz; fiyat hep elle girilir.
+   */
+  priceMode?: "auto" | "spread" | "manual";
+  /** Banka makası (kesir). Ör. 0.018 = piyasanın %1,8 üzeri. "spread" modunda kullanılır. */
+  spreadPct?: number;
   targetPrice?: number;
   stopLossPrice?: number;
   note?: string; // "neden aldım"

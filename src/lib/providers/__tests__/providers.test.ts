@@ -7,6 +7,7 @@ import {
   gramGoldFromOunce,
   yahooProvider,
 } from "../yahoo";
+import { truncgilGoldProvider } from "../truncgil";
 
 const TCMB_XML = `<?xml version="1.0"?>
 <Tarih_Date>
@@ -66,11 +67,14 @@ describe("provider supports yönlendirmesi", () => {
     expect(tefasProvider.supports({ ticker: "AFT", type: "fon", currency: "TRY" })).toBe(true);
     expect(tefasProvider.supports({ ticker: "ASELS", type: "hisse", currency: "TRY" })).toBe(false);
   });
-  it("hisse/kripto/altın → yahoo", () => {
+  it("hisse/kripto → yahoo (altın değil)", () => {
     expect(yahooProvider.supports({ ticker: "ASELS", type: "hisse", currency: "TRY" })).toBe(true);
     expect(yahooProvider.supports({ ticker: "BTC", type: "kripto", currency: "TRY" })).toBe(true);
-    expect(yahooProvider.supports({ ticker: "XAU", type: "altin", currency: "TRY" })).toBe(true);
-    expect(yahooProvider.supports({ ticker: "USD", type: "doviz", currency: "USD" })).toBe(false);
+    expect(yahooProvider.supports({ ticker: "XAU", type: "altin", currency: "TRY" })).toBe(false);
+  });
+  it("altın → truncgil", () => {
+    expect(truncgilGoldProvider.supports({ ticker: "XAU", type: "altin", currency: "TRY" })).toBe(true);
+    expect(truncgilGoldProvider.supports({ ticker: "ASELS", type: "hisse", currency: "TRY" })).toBe(false);
   });
   it("döviz → tcmb", () => {
     expect(tcmbProvider.supports({ ticker: "USD", type: "doviz", currency: "USD" })).toBe(true);

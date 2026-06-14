@@ -1,10 +1,16 @@
 // Sağlayıcı kayıt defteri ve çözümleyici. Yalnızca sunucuda kullanılır.
 import type { PriceProvider, PriceQuery, PriceResult } from "./types";
 import { tefasProvider } from "./tefas";
+import { truncgilGoldProvider } from "./truncgil";
 import { yahooProvider } from "./yahoo";
 import { tcmbProvider } from "./tcmb";
 
-const PROVIDERS: PriceProvider[] = [tefasProvider, yahooProvider, tcmbProvider];
+const PROVIDERS: PriceProvider[] = [
+  tefasProvider,
+  truncgilGoldProvider,
+  yahooProvider,
+  tcmbProvider,
+];
 
 /** Varlık türüne uygun ilk sağlayıcıyı bulup fiyatı döndürür. */
 export async function resolvePrice(q: PriceQuery): Promise<PriceResult> {

@@ -38,25 +38,16 @@ async function yahooPrice(symbol: string): Promise<number | null> {
 }
 
 export const yahooProvider: PriceProvider = {
-  supports: (q: PriceQuery) =>
-    q.type === "hisse" || q.type === "kripto" || q.type === "altin",
+  // Altın artık TR serbest piyasa (truncgil) ile çekiliyor; Yahoo hisse + kripto.
+  supports: (q: PriceQuery) => q.type === "hisse" || q.type === "kripto",
   async fetchPrice(q: PriceQuery): Promise<PriceResult> {
     if (q.type === "hisse") {
       return { price: await yahooPrice(bistSymbol(q.ticker)), source: "yahoo" };
     }
-    if (q.type === "kripto") {
-      const usd = await yahooPrice(cryptoSymbol(q.ticker));
-      const usdTry = await getRate("USD");
-      const price = usd != null && usdTry != null ? usd * usdTry : null;
-      return { price, source: "yahoo" };
-    }
-    // altın: ons/USD (GC=F) → gram ₺
-    const ounceUsd = await yahooPrice("GC=F");
+    // kripto: {T}-USD × USD/TRY
+    const usd = await yahooPrice(cryptoSymbol(q.ticker));
     const usdTry = await getRate("USD");
-    const price =
-      ounceUsd != null && usdTry != null
-        ? gramGoldFromOunce(ounceUsd, usdTry)
-        : null;
+    const price = usd != null && usdTry != null ? usd * usdTry : null;
     return { price, source: "yahoo" };
   },
 };
