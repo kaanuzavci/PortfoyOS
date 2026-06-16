@@ -24,6 +24,7 @@ import { ValueAreaChart } from "@/components/charts/value-area-chart";
 import { AllocationDonut } from "@/components/charts/allocation-donut";
 import { MoversList } from "@/components/dashboard/movers-list";
 import { StreakStrip } from "@/components/dashboard/streak-strip";
+import { TopGainers } from "@/components/dashboard/top-gainers";
 import { BenchmarkCard } from "@/components/dashboard/benchmark-card";
 import { SeedButton } from "@/components/dashboard/seed-button";
 import { Change } from "@/components/shared/change";
@@ -184,6 +185,13 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Son 7 günde en çok artanlar (sahip olunan + izleme listesi) */}
+      <TopGainers
+        assets={pf.raw.assets}
+        snapshots={pf.raw.priceSnapshots}
+        now={pf.now}
+      />
 
       {/* Seriler */}
       <StreakStrip

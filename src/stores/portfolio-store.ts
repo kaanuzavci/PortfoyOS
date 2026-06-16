@@ -51,6 +51,17 @@ interface PortfolioState extends PortfolioData {
   deletePriceSnapshot: (id: string) => void;
   /** Fiyat geçmişini kademeli sıkıştırır (1 MB sınırına takılmamak için). */
   compactPrices: (now?: number) => void;
+  /**
+   * Gerçek geçmiş fiyat noktalarını varlığın snapshot'larına işler (gün bazında
+   * üzerine yazar). Banka makası modunda makas uygulanır. replace=true ise eski
+   * snapshot'lar silinip yalnızca gerçek geçmiş bırakılır (sahte demo onarımı).
+   */
+  mergeHistory: (
+    assetId: string,
+    points: { date: number; price: number }[],
+    source: string,
+    replace?: boolean,
+  ) => void;
 
   // Macro
   addMacroSnapshot: (m: Omit<MacroSnapshot, "id">) => MacroSnapshot;
@@ -168,7 +179,13 @@ export const usePortfolioStore = create<PortfolioState>()(
 
       addTransaction: (t) => {
         const tx: Transaction = { ...t, id: uid(), createdAt: Date.now() };
-        set((s) => ({ transactions: [...s.transactions, tx] }));
+        set((s) => ({
+          transactions: [...s.transactions, tx],
+          // İzleme listesindeki varlık alınınca portföye geçer.
+          assets: s.assets.map((a) =>
+            a.id === t.assetId && a.isWatchlist ? { ...a, isWatchlist: false } : a,
+          ),
+        }));
         return tx;
       },
       updateTransaction: (id, patch) =>
@@ -202,6 +219,37 @@ export const usePortfolioStore = create<PortfolioState>()(
           return compacted.length < s.priceSnapshots.length
             ? { priceSnapshots: compacted }
             : {};
+        }),
+      mergeHistory: (assetId, points, source, replace = false) =>
+        set((s) => {
+          if (points.length === 0) return {};
+          const asset = s.assets.find((a) => a.id === assetId);
+          const spread =
+            asset?.priceMode === "spread" && typeof asset.spreadPct === "number"
+              ? asset.spreadPct
+              : 0;
+          const others = s.priceSnapshots.filter((p) => p.assetId !== assetId);
+          // Gün → snapshot (replace değilse mevcutlarla başla)
+          const byDay = new Map<number, PriceSnapshot>();
+          if (!replace) {
+            for (const p of s.priceSnapshots) {
+              if (p.assetId === assetId) byDay.set(startOfDay(p.date), p);
+            }
+          }
+          for (const pt of points) {
+            const day = startOfDay(pt.date);
+            const price = spread ? pt.price * (1 + spread) : pt.price;
+            const existing = byDay.get(day);
+            byDay.set(day, {
+              id: existing?.id ?? uid(),
+              assetId,
+              date: day,
+              price: Math.round(price * 100) / 100,
+              source,
+            });
+          }
+          const merged = [...others, ...byDay.values()];
+          return { priceSnapshots: compactSnapshots(merged) };
         }),
 
       addMacroSnapshot: (m) => {

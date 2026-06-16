@@ -8,6 +8,7 @@ import {
   Settings,
   ShieldCheck,
   NotebookPen,
+  Eye,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,6 +36,7 @@ export const navGroups: NavGroup[] = [
   {
     label: "Planlama",
     items: [
+      { href: "/watchlist", label: "İzleme Listesi", icon: Eye },
       { href: "/ipo", label: "Halka Arz", icon: Rocket },
       { href: "/goals", label: "Hedefler", icon: Target },
       { href: "/journal", label: "Karar Günlüğü", icon: NotebookPen },

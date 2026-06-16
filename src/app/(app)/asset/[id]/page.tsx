@@ -22,6 +22,7 @@ import { StreakBadge } from "@/components/dashboard/streak-badge";
 import { ValueAreaChart } from "@/components/charts/value-area-chart";
 import { TransactionForm } from "@/components/forms/transaction-form";
 import { RefreshPricesButton } from "@/components/forms/refresh-prices-button";
+import { BackfillButton } from "@/components/forms/backfill-button";
 import { StaleBadge } from "@/components/shared/stale-badge";
 import { TaxEstimateCard } from "@/components/asset/tax-estimate-card";
 import { snapTryPrice } from "@/lib/calc";
@@ -91,6 +92,7 @@ export default function AssetDetailPage({
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <StreakBadge streak={pos.streak} />
+            <BackfillButton asset={a} variant="outline" />
             <RefreshPricesButton variant="outline" />
             <TransactionForm
               defaultAssetId={a.id}

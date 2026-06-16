@@ -46,6 +46,8 @@ export interface Asset {
   targetPrice?: number;
   stopLossPrice?: number;
   note?: string; // "neden aldım"
+  /** İzleme listesi öğesi mi? (henüz almadığın, takip ettiğin varlık) */
+  isWatchlist?: boolean;
   isArchived: boolean;
   createdAt: number;
   updatedAt: number;

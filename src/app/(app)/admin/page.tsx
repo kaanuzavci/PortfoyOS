@@ -8,6 +8,7 @@ import { AssetForm } from "@/components/forms/asset-form";
 import { ManualPriceRow } from "@/components/forms/manual-price-row";
 import { MacroForm } from "@/components/forms/macro-form";
 import { RefreshPricesButton } from "@/components/forms/refresh-prices-button";
+import { BackfillButton } from "@/components/forms/backfill-button";
 import { StaleBadge } from "@/components/shared/stale-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -112,7 +113,10 @@ export default function AdminPage() {
                   Manuel giriş her zaman birinci sınıf yoldur.
                 </p>
               </div>
-              <RefreshPricesButton />
+              <div className="flex flex-wrap gap-2">
+                <BackfillButton />
+                <RefreshPricesButton />
+              </div>
             </CardHeader>
             <CardContent className="space-y-2">
               {activeAssets.length === 0 ? (

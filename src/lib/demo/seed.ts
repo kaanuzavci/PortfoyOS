@@ -36,7 +36,8 @@ interface AssetSpec {
   ticker: string;
   type: Asset["type"];
   sector?: string;
-  start: number; // başlangıç fiyatı (TRY)
+  start: number; // şekil için göreli başlangıç (seri sona göre ölçeklenir)
+  current: number; // bugünkü gerçekçi fiyat (seri buraya çıpalanır — sıçrama olmasın)
   driftDaily: number; // günlük ortalama getiri
   vol: number; // günlük oynaklık
   units: number; // ilk alış adedi
@@ -56,6 +57,7 @@ const specs: AssetSpec[] = [
     type: "fon",
     sector: "Teknoloji",
     start: 24.5,
+    current: 31.2,
     driftDaily: 0.0022,
     vol: 0.011,
     units: 1200,
@@ -70,6 +72,7 @@ const specs: AssetSpec[] = [
     type: "hisse",
     sector: "Savunma",
     start: 48,
+    current: 371,
     driftDaily: 0.0028,
     vol: 0.017,
     units: 400,
@@ -85,6 +88,7 @@ const specs: AssetSpec[] = [
     type: "hisse",
     sector: "Enerji",
     start: 165,
+    current: 176,
     driftDaily: 0.0011,
     vol: 0.015,
     units: 120,
@@ -99,6 +103,7 @@ const specs: AssetSpec[] = [
     type: "altin",
     sector: "Değerli Metal",
     start: 2380,
+    current: 6280,
     driftDaily: 0.0016,
     vol: 0.008,
     units: 30,
@@ -112,6 +117,7 @@ const specs: AssetSpec[] = [
     type: "doviz",
     sector: "Döviz",
     start: 31.8,
+    current: 46.2,
     driftDaily: 0.0009,
     vol: 0.004,
     units: 2500,
@@ -125,6 +131,7 @@ const specs: AssetSpec[] = [
     type: "hisse",
     sector: "Perakende",
     start: 92,
+    current: 95,
     driftDaily: -0.0014,
     vol: 0.02,
     units: 150,
@@ -162,15 +169,20 @@ export function generateSeed(now = Date.now()): PortfolioData {
       updatedAt: today,
     });
 
-    // Fiyat serisi: tohumlu rastgele yürüyüş
+    // Fiyat serisi: tohumlu rastgele yürüyüş (göreli şekil)
     let price = spec.start;
     const series: { date: number; price: number }[] = [];
     for (let d = horizon; d >= 0; d--) {
       const date = today - d * DAY;
       const shock = (rand() - 0.5) * 2 * spec.vol;
       price = Math.max(0.01, price * (1 + spec.driftDaily + shock));
-      series.push({ date, price: round2(price) });
+      series.push({ date, price });
     }
+    // Seriyi bugünkü gerçekçi fiyata (current) çıpala — "Fiyatları güncelle"
+    // gerçek fiyatı yazınca dikey sıçrama olmasın.
+    const lastPrice = series[series.length - 1].price || spec.current;
+    const scale = spec.current / lastPrice;
+    for (const pt of series) pt.price = round2(pt.price * scale);
     for (const pt of series) {
       priceSnapshots.push({
         id: `${spec.id}-p-${pt.date}`,

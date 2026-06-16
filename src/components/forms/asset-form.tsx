@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { InfoHint } from "@/components/shared/info-hint";
+import { useHistoryBackfill } from "@/hooks/use-history-backfill";
 import { toast } from "sonner";
 import { ASSET_TYPE_LABELS, type Asset, type AssetType, type Currency } from "@/types";
 
@@ -43,6 +44,7 @@ export function AssetForm({
   const addAsset = usePortfolioStore((s) => s.addAsset);
   const updateAsset = usePortfolioStore((s) => s.updateAsset);
   const setManualPrice = usePortfolioStore((s) => s.setManualPrice);
+  const { backfill } = useHistoryBackfill();
 
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen ?? internalOpen;
@@ -87,6 +89,10 @@ export function AssetForm({
       toast.success("Varlık eklendi", {
         description: price ? "Başlangıç fiyatı da kaydedildi." : undefined,
       });
+      // Kodlu ve çekilebilir türse gerçek fiyat geçmişini arka planda getir.
+      if (created.ticker && created.type !== "fon") {
+        backfill([created], false).catch(() => {});
+      }
     }
     setOpen(false);
   };

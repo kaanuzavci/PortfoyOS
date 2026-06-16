@@ -7,4 +7,5 @@ export * from "./benchmark";
 export * from "./streak";
 export * from "./tax";
 export * from "./compact";
+export * from "./price-change";
 export * from "./portfolio";
